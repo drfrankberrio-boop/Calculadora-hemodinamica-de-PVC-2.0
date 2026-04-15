@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Calculadoras de PVC</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: #ffffff;
+    color: #0f172a;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1000px;
+    margin: auto;
+}
+
+.card {
+    background: #f1f5f9;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+h2 {
+    color: #0284c7;
+}
+
+input, button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 8px;
+}
+
+button {
+    background: #0284c7;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.result {
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.formula {
+    font-size: 13px;
+    color: #334155;
+}
+
+.alert {
+    margin-top: 8px;
+    font-size: 14px;
+}
+
+.footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Calculadoras de PVC</h1>
+
+<!-- PVC CVC -->
+<div class="card">
+<h2>PVC por CVC</h2>
+
+<input id="cm" type="number" placeholder="cmH2O">
+
+<button onclick="pvc()">Calcular</button>
+
+<div id="r1" class="result"></div>
+<div id="a1" class="alert"></div>
+
+<div class="formula">
+mmHg = cmH₂O / 1.36
+</div>
+</div>
+
+<!-- VCI ESPONTANEO -->
+<div class="card">
+<h2>PVC por VCI (Respiración espontánea)</h2>
+
+<input id="max1" type="number" placeholder="Diámetro máximo (cm)">
+<input id="min1" type="number" placeholder="Diámetro mínimo (cm)">
+
+<button onclick="vci()">Calcular</button>
+
+<div id="r2" class="result"></div>
+
+<div class="formula">
+Colapsabilidad = (Dmax - Dmin) / Dmax × 100
+</div>
+</div>
+
+<!-- DISTENSIBILIDAD -->
+<div class="card">
+<h2>Distensibilidad VCI (Ventilación mecánica)</h2>
+
+<input id="max2" type="number" placeholder="Diámetro máximo (cm)">
+<input id="min2" type="number" placeholder="Diámetro mínimo (cm)">
+
+<button onclick="dist()">Calcular</button>
+
+<div id="r3" class="result"></div>
+
+<div class="formula">
+Distensibilidad = (Dmax - Dmin) / Dmin × 100
+</div>
+</div>
+
+</div>
+
+<div class="footer">
+Creado por el Doctor Francisco Berrio - Residente de cuarto año de Terapia Intensiva - Clínica ITEBA y USAL | Utilizando IA
+</div>
+
+<script>
+
+// PVC
+function pvc(){
+let cm = parseFloat(document.getElementById("cm").value);
+if(isNaN(cm)) return;
+
+let mm = cm / 1.36;
+let txt = "";
+let alert = "";
+
+if(mm < 5){
+txt = "PVC baja";
+alert = "⚠️ Considerar hipovolemia → evaluar respuesta a fluidos";
+}
+else if(mm <= 10){
+txt = "PVC normal";
+alert = "✔️ Estado hemodinámico estable";
+}
+else{
+txt = "PVC alta";
+alert = "⚠️ Considerar congestión / falla VD / presión intratorácica elevada";
+}
+
+document.getElementById("r1").innerHTML = mm.toFixed(2) + " mmHg → " + txt;
+document.getElementById("a1").innerHTML = alert;
+}
+
+// VCI espontáneo
+function vci(){
+let max = parseFloat(document.getElementById("max1").value);
+let min = parseFloat(document.getElementById("min1").value);
+
+if(isNaN(max) || isNaN(min) || min > max) return;
+
+let col = ((max - min) / max) * 100;
+let res = "";
+
+if(max < 2.1 && col > 50){
+res = "PVC baja (0–5 mmHg)";
+}
+else if(max > 2.1 && col < 50){
+res = "PVC alta (10–20 mmHg)";
+}
+else{
+res = "PVC intermedia (5–10 mmHg)";
+}
+
+document.getElementById("r2").innerHTML =
+"Colapsabilidad: " + col.toFixed(1) + "% → " + res;
+}
+
+// Distensibilidad (VM)
+function dist(){
+let max = parseFloat(document.getElementById("max2").value);
+let min = parseFloat(document.getElementById("min2").value);
+
+if(isNaN(max) || isNaN(min) || min <= 0) return;
+
+let d = ((max - min) / min) * 100;
+let res = "";
+
+if(d > 18){
+res = "Alta probabilidad de respuesta a fluidos";
+}
+else{
+res = "Baja probabilidad de respuesta a fluidos";
+}
+
+document.getElementById("r3").innerHTML =
+"Distensibilidad: " + d.toFixed(1) + "% → " + res;
+}
+
+</script>
+
+</body>
+</html>
